@@ -1,0 +1,15 @@
+# Environment variables
+.env
+
+# Composer
+/vendor/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Cache (kalau ada)
+cache/

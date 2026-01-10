@@ -1,0 +1,15 @@
+{
+  "name": "pc/si_sekolah_modul_pengumuman_vanila",
+  "autoload": {
+    "psr-4": {
+      "App\\": "app/"
+    }
+  },
+  "authors": [
+    {
+      "name": "Lenzi1902",
+      "email": "144054026+Lenzi1902@users.noreply.github.com"
+    }
+  ],
+  "require": {}
+}
