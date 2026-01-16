@@ -2,11 +2,12 @@
 namespace App\Controllers;
 
 use App\Models\Absensi;
+use App\Core\Auth;
 
 class AbsensiController {
 
   public function store() {
-    header('Content-Type: application/json');
+    Auth::role(['guru', 'admin']);
 
     $input = json_decode(file_get_contents("php://input"), true);
 
@@ -16,23 +17,17 @@ class AbsensiController {
       return;
     }
 
-    $absensi = new Absensi();
-    $success = $absensi->create(
-      $input['siswa_id'],
+    (new Absensi())->create(
+      (int)$input['siswa_id'],
       $input['tanggal'],
       $input['status']
     );
 
-    if ($success) {
-      echo json_encode(['message' => 'Absensi berhasil disimpan']);
-    } else {
-      http_response_code(500);
-      echo json_encode(['message' => 'Gagal menyimpan absensi']);
-    }
+    echo json_encode(['message' => 'Absensi disimpan']);
   }
 
   public function index() {
-    header('Content-Type: application/json');
+    Auth::check();
 
     if (!isset($_GET['siswa_id'])) {
       http_response_code(400);
@@ -40,9 +35,7 @@ class AbsensiController {
       return;
     }
 
-    $absensi = new Absensi();
-    $data = $absensi->getBySiswa($_GET['siswa_id']);
-
+    $data = (new Absensi())->getBySiswa((int)$_GET['siswa_id']);
     echo json_encode($data);
   }
 }

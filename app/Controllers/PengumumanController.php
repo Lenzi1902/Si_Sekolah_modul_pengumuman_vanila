@@ -2,45 +2,40 @@
 namespace App\Controllers;
 
 use App\Models\Pengumuman;
+use App\Core\Auth;
 
 class PengumumanController {
 
-public function index() {
-  header('Content-Type: application/json');
+  public function index() {
+    Auth::check();
 
-  $pengumuman = new Pengumuman();
+    $model = new Pengumuman();
 
-  if (isset($_GET['kelas_id'])) {
-    $data = $pengumuman->byKelas($_GET['kelas_id']);
-  } elseif (isset($_GET['target'])) {
-    $data = $pengumuman->byTarget($_GET['target']);
-  } else {
-    $data = $pengumuman->all();
+    if (isset($_GET['kelas_id'])) {
+      $data = $model->byKelas((int)$_GET['kelas_id']);
+    } elseif (isset($_GET['target'])) {
+      $data = $model->byTarget($_GET['target']);
+    } else {
+      $data = $model->all();
+    }
+
+    echo json_encode($data);
   }
 
-  echo json_encode($data);
-}
-
-
   public function store() {
-    header('Content-Type: application/json');
+    Auth::role(['admin', 'guru']);
 
     $input = json_decode(file_get_contents("php://input"), true);
 
-    if (!isset($input['judul'], $input['isi'], $input['target'], $input['created_by'])) {
+    if (!isset($input['judul'], $input['isi'], $input['target'])) {
       http_response_code(400);
-      echo json_encode(['message' => 'Data pengumuman tidak lengkap']);
+      echo json_encode(['message' => 'Data tidak lengkap']);
       return;
     }
 
-    $pengumuman = new Pengumuman();
-    $success = $pengumuman->create($input);
+    $input['created_by'] = Auth::user()['id'];
 
-    if ($success) {
-      echo json_encode(['message' => 'Pengumuman berhasil ditambahkan']);
-    } else {
-      http_response_code(500);
-      echo json_encode(['message' => 'Gagal menambahkan pengumuman']);
-    }
+    (new Pengumuman())->create($input);
+    echo json_encode(['message' => 'Pengumuman ditambahkan']);
   }
 }
